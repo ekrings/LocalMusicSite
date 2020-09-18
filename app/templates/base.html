@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+            {% if title %}
+            <title>{{ title }} - Local Music DB</title>
+            {% else %}
+            <title>Welcome to the Local Music DB</title>
+            {% endif %}
+    </head>
+<body>
+        <div>
+            <b><a href="/index">Ithaca Music</a></b>
+            <a href="/artists">Artists</a>
+            <a href="/newArtist">New Artists</a>
+        </div>
+{% block content %}{% endblock %}
+</body>
+</html>
