@@ -12,8 +12,20 @@
         <div>
             <b><a href="/index">Ithaca Music</a></b>
             <a href="/artists">Artists</a>
-            <a href="/newArtist">New Artists</a>
+            <a href="/newArtists">New Artists</a>
         </div>
-{% block content %}{% endblock %}
+
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+{% block content %}
+{% endblock %}
 </body>
 </html>
