@@ -2,7 +2,8 @@
 
 {% block content %}
     <h2>List of Artists</h2>
-        {% for artistName in artists %}
-        <p><a href="/about">{{ artistName }}</a></p>
+
+        {% for artist in artists %}
+        <a href="{{ url_for('about', name=artist.artistName) }}">{{ artist.artistName }}</a><br><br>
         {% endfor %}
 {% endblock %}
