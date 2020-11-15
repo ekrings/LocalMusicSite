@@ -10,9 +10,16 @@
     </head>
 <body>
         <div>
-            <b><a href="/index">Ithaca Music</a></b>
-            <a href="/artists">Artists</a>
-            <a href="/newArtists">New Artists</a>
+            <a href="{{ url_for('index') }}">Ithaca Music</a>
+            <a href="{{ url_for('artists') }}">Artists</a>
+            {% if current_user.is_anonymous%}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% else %}
+                <a href="{{ url_for('newArtists') }}">New Artists</a>
+                <a href="{{ url_for('newVenue') }}">New Venue</a>
+                <a href="{{ url_for('newEvent') }}">New Event</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% endif %}
         </div>
 
         <hr>
@@ -25,7 +32,6 @@
         </ul>
         {% endif %}
         {% endwith %}
-{% block content %}
-{% endblock %}
+{% block content %}{% endblock %}
 </body>
 </html>
