@@ -3,14 +3,35 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db, login
 
+
 class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artistName = db.Column(db.String(60), index=True, unique=True)
+    artistName = db.Column(db.String(60), index=True)
     description = db.Column(db.String(240), index=True)
     hometown = db.Column(db.String(128), index=True)
+    artist_to_events = db.relationship("ArtistToEvent", backref="artist", lazy="dynamic")
 
     def __repr__(self):
         return '<Artist ()>'.format(self.artistName)
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(60), index=True)
+    date = db.Column(db.String(60), index=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    artist_to_events = db.relationship("ArtistToEvent", backref="event", lazy="dynamic")
+
+class Venue(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(60), index=True)
+    address = db.Column(db.String(60), index=True)
+    city = db.Column(db.String(128), index=True)
+    state = db.Column(db.String(60), index=True)
+    events = db.relationship("Event", backref='venue', lazy="dynamic")
+
+class ArtistToEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -31,22 +52,3 @@ class User(db.Model, UserMixin):
 def load_user(id):
     return User.query.get(int(id))
 
-class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(60), index=True)
-    date = db.Column(db.String(60), index=True)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
-
-
-class Venue(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(60), index=True)
-    address = db.Column(db.String(60), index=True)
-    city = db.Column(db.String(128), index=True)
-    state = db.Column(db.String(60), index=True)
-
-class ArtistToEvent(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))

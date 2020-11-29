@@ -3,7 +3,9 @@ from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
 from app.forms import CreateNewArtist, LoginForm, RegistrationForm, CreateNewVenue, CreateNewEvent
-from app.models import Artist, Event, Venue, User
+from app.models import Artist, Event, Venue, User, ArtistToEvent
+from flask_datepicker import datepicker
+
 
 
 @app.route('/')
@@ -25,18 +27,27 @@ def about(name):
 
 @app.route('/populate_db')
 def populate_db():
-    a1 = Artist(artistName='Stella Donnelly', hometown='Western Australia, Australia')
-    a2 = Artist(artistName='Steve Lacy', hometown='Compton, California')
-    a3 = Artist(artistName='Harry Styles', hometown='Redditch, United Kingdom')
-    v1 = Venue(name='The Haunt', city='Ithaca, NY')
-    v2 = Venue(name='Carnegie Hall', city='New York, NY')
-    v3 = Venue(name='The Fonda Theatre', city='Los Angeles, CA')
-    e1 = Event(date='Oct 12', venue_id=2, artist_id=1)
-    e2 = Event(date='Sept 8', venue_id=3, artist_id=2)
-    e3 = Event(date='Nov 30', venue_id=1, artist_id=3)
-    e4 = Event(date='Dec 23', venue_id=1, artist_id=1)
-    e5 = Event(date='Oct 31', venue_id=2, artist_id=2)
-    db.session.add_all([a1, a2, a3, v1, v2, v3, e1, e2, e3, e4, e5])
+    a1 = Artist(artistName='Stella Donnelly', description='indie-rock',hometown='Western Australia, Australia')
+    a2 = Artist(artistName='Steve Lacy', description='r&b, rock', hometown='Compton, California')
+    a3 = Artist(artistName='Harry Styles', description='pop rock', hometown='Redditch, United Kingdom')
+
+    v1 = Venue(name='The Haunt', address='702 Willow Ave', city='Ithaca', state='NY')
+    v2 = Venue(name='Carnegie Hall', address='881 7th Ave', city='New York', state='NY')
+    v3 = Venue(name='The Fonda Theatre', address='6126 Hollywood Blvd', city='Los Angeles', state='CA')
+
+    e1 = Event(name='Groovy Times', date='Oct 12', venue=v2)
+    e2 = Event(name='Soothing Soul', date='Sept 8', venue=v3)
+    e3 = Event(name='Rocking Rhythms', date='Nov 30', venue=v1)
+    e4 = Event(name='Grandma Jams', date='Dec 23', venue=v1)
+    e5 = Event(name='Wow Did U Hear That?!', date='Oct 31', venue=v2)
+
+    a2e1 = ArtistToEvent(artist=a1, event=e1)
+    a2e2 = ArtistToEvent(artist=a2, event=e2)
+    a2e3 = ArtistToEvent(artist=a3, event=e3)
+    a2e4 = ArtistToEvent(artist=a1, event=e4)
+    a2e5 = ArtistToEvent(artist=a1, event=e5)
+
+    db.session.add_all([a1, a2, a3, v1, v2, v3, e1, e2, e3, e4, e5, a2e1, a2e2, a2e3, a2e4, a2e5])
     db.session.commit()
     return "Database has been populated"
 
@@ -120,13 +131,15 @@ def newVenue():
 @login_required
 def newEvent():
     form = CreateNewEvent()
-    venue = Venue.query.all()
+    session['date'] = form.date.data
+    form.venue.choices = [(v.id, v.name) for v in Venue.query.order_by('name').all()]
+    form.artists.choices = [(a.id, a.artistName) for a in Artist.query.order_by('artistName').all()]
+
     if form.validate_on_submit():
-        e1 = Event(name=form.name.data, date=form.startTime.data, venue_id=venue)
-        session['startdate'] = form.startdate.data
-        form.venue.choices = [(g.id, g.name) for g in Venue.query.order_by('name')]
+        e1 = Event(name=form.name.data, date=form.date.data, venue_id=form.venue.data, artist_id=form.artists.data)
         db.session.add(e1)
         db.session.commit()
+        #loop for artists to events
         flash('New event created: {}'.format(form.name.data))
         return redirect(url_for('artists'))
     return render_template('newEvent.html', title="Add New Event", form=form)

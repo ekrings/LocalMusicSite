@@ -2,18 +2,20 @@
 
 {% block content %}
         <p>
-            <strong>Artist: </strong>{{ info.artistName }}
-       ` <br><br>
-        <strong>About: </strong>{{ info.description }}
-        <br><br>
-            <strong>Hometown: </strong>{{ info.hometown }}
+
+            <h1>{{ info.artistName }}</h1>
+            <strong>Hometown:</strong>
+                {{ info.hometown }}
+            <br>
+            <strong>Description:</strong>
+                {{ info.description }}
             <br><br>
         <ul>
        {% for event in event_list %}
         <li><b>{{ event.name }}</b> at the <b>{{ event.venue.venueName }}</b>
             on <b>{{event.start_time.strftime('%A, %b %d %Y')}}</b>.</li>
        {% endfor %}
-        </ul>`
+        </ul>
         </p>
 
 {% endblock %}
